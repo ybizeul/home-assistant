@@ -83,7 +83,7 @@ class TibberSensor(Entity):
                 future = True
                 _data = [{'x': prev_date.isoformat(), 'y': [None, prev_y, None]},
                          {'x': _date.isoformat(), 'y': [None, y_val, None]}]
-                data += _d
+                data += _data
             if not future:
                 _data = [{'x': _date.isoformat(), 'y': [y_val, None, None]}]
             else:
