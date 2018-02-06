@@ -5,6 +5,7 @@ For more details about this platform, please refer to the documentation at
 https://home-assistant.io/components/sensor.tibber/
 """
 import asyncio
+from datetime import datetime
 
 import logging
 
@@ -18,7 +19,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.entity import Entity
 from homeassistant.util import dt as dt_util
 
-REQUIREMENTS = ['pyTibber==0.2.1']
+REQUIREMENTS = ['pyTibber==0.2.2']
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -53,7 +54,7 @@ class TibberSensor(Entity):
         self._tibber_home = tibber_home
         self._last_updated = None
         self._state = None
-        self._device_state_attributes = None
+        self._device_state_attributes = {}
         self._unit_of_measurement = None
         self._name = 'Electricity price {}'.format(self._tibber_home.address1)
 
@@ -65,12 +66,41 @@ class TibberSensor(Entity):
            == dt_util.utcnow().hour:
             return
 
-        yield from self._tibber_home.update_current_price_info()
+        yield from self._tibber_home.update_price_info()
 
         self._state = self._tibber_home.current_price_total
+        if not self._state:
+            _LOGGER.error('No data from Tibber. Check your network connection')
+            return
+        data = []
+        future = False
+        prev_y = None
+        prev_date = None
+        for x, y in sorted(self._tibber_home.price_total.items()):
+            _date = datetime.strptime(''.join(x.rsplit(':', 1)),
+                                         '%Y-%m-%dT%H:%M:%S%z')
+            if _date > dt_util.utcnow() and not future:
+                future = True
+                _d = [{'x': prev_date.isoformat(), 'y': [None, prev_y, None]},
+                      {'x': _date.isoformat(), 'y': [None, y, None]}]
+                data += _d
+            if not future:
+                _d = [{'x': _date.isoformat(), 'y': [y, None, None]}]
+            else:
+                _d = [{'x': _date.isoformat(), 'y': [None, None, y]}]
+            data += _d
+            prev_y = y
+            prev_date = _date
+        self._device_state_attributes = self._tibber_home.current_price_info
+        self._device_state_attributes['_plot_data'] = {'data': data,
+                                                      'color': ['#666666', 'red', 'blue'],
+                                                      'attr': ['Electricity price',
+                                                               'Electricity price',
+                                                               'Electricity price']
+                                                      }
+
         self._last_updated = self._tibber_home.current_price_info.\
             get('startsAt')
-        self._device_state_attributes = self._tibber_home.current_price_info
         self._unit_of_measurement = self._tibber_home.price_unit
 
     @property
