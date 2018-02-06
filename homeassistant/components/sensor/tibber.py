@@ -96,8 +96,7 @@ class TibberSensor(Entity):
                       'color': ['#666666', 'red', 'blue'],
                       'attr': ['Electricity price',
                                'Electricity price',
-                               'Electricity price']
-                      }
+                               'Electricity price']}
         self._device_state_attributes['_plot_data'] = _plot_data
 
         self._last_updated = self._tibber_home.current_price_info.\
