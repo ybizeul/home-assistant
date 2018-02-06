@@ -78,7 +78,7 @@ class TibberSensor(Entity):
         prev_date = None
         for x, y in sorted(self._tibber_home.price_total.items()):
             _date = datetime.strptime(''.join(x.rsplit(':', 1)),
-                                         '%Y-%m-%dT%H:%M:%S%z')
+                                      '%Y-%m-%dT%H:%M:%S%z')
             if _date > dt_util.utcnow() and not future:
                 future = True
                 _d = [{'x': prev_date.isoformat(), 'y': [None, prev_y, None]},
@@ -92,12 +92,13 @@ class TibberSensor(Entity):
             prev_y = y
             prev_date = _date
         self._device_state_attributes = self._tibber_home.current_price_info
-        self._device_state_attributes['_plot_data'] = {'data': data,
-                                                      'color': ['#666666', 'red', 'blue'],
-                                                      'attr': ['Electricity price',
-                                                               'Electricity price',
-                                                               'Electricity price']
-                                                      }
+        _plot_data = {'data': data,
+                      'color': ['#666666', 'red', 'blue'],
+                      'attr': ['Electricity price',
+                               'Electricity price',
+                               'Electricity price']
+                      }
+        self._device_state_attributes['_plot_data'] = _plot_data
 
         self._last_updated = self._tibber_home.current_price_info.\
             get('startsAt')
