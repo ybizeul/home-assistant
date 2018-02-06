@@ -5,11 +5,10 @@ For more details about this platform, please refer to the documentation at
 https://home-assistant.io/components/sensor.tibber/
 """
 import asyncio
-from datetime import datetime
 
 import logging
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 import voluptuous as vol
 
 import homeassistant.helpers.config_validation as cv
