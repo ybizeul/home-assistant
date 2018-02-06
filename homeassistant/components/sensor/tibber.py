@@ -76,20 +76,20 @@ class TibberSensor(Entity):
         future = False
         prev_y = None
         prev_date = None
-        for x, y in sorted(self._tibber_home.price_total.items()):
-            _date = datetime.strptime(''.join(x.rsplit(':', 1)),
+        for x_val, y_val in sorted(self._tibber_home.price_total.items()):
+            _date = datetime.strptime(''.join(x_val.rsplit(':', 1)),
                                       '%Y-%m-%dT%H:%M:%S%z')
             if _date > dt_util.utcnow() and not future:
                 future = True
-                _d = [{'x': prev_date.isoformat(), 'y': [None, prev_y, None]},
-                      {'x': _date.isoformat(), 'y': [None, y, None]}]
+                _data = [{'x': prev_date.isoformat(), 'y': [None, prev_y, None]},
+                         {'x': _date.isoformat(), 'y': [None, y_val, None]}]
                 data += _d
             if not future:
-                _d = [{'x': _date.isoformat(), 'y': [y, None, None]}]
+                _data = [{'x': _date.isoformat(), 'y': [y_val, None, None]}]
             else:
-                _d = [{'x': _date.isoformat(), 'y': [None, None, y]}]
-            data += _d
-            prev_y = y
+                _data = [{'x': _date.isoformat(), 'y': [None, None, y_val]}]
+            data += _data
+            prev_y = y_val
             prev_date = _date
         self._device_state_attributes = self._tibber_home.current_price_info
         _plot_data = {'data': data,
