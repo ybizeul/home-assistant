@@ -81,8 +81,10 @@ class TibberSensor(Entity):
                                       '%Y-%m-%dT%H:%M:%S%z')
             if _date > dt_util.utcnow() and not future:
                 future = True
-                _data = [{'x': prev_date.isoformat(), 'y': [None, prev_y, None]},
-                         {'x': _date.isoformat(), 'y': [None, y_val, None]}]
+                _data = [{'x': prev_date.isoformat(),
+                          'y': [None, prev_y, None]},
+                         {'x': _date.isoformat(),
+                          'y': [None, y_val, None]}]
                 data += _data
             if not future:
                 _data = [{'x': _date.isoformat(), 'y': [y_val, None, None]}]
