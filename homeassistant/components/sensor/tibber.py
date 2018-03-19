@@ -59,6 +59,7 @@ class TibberSensor(Entity):
         self._tibber_home = tibber_home
         self._last_updated = None
         self._state = None
+        self._is_available = False
         self._device_state_attributes = {}
         self._unit_of_measurement = self._tibber_home.price_unit
         self._name = 'Electricity price {}'.format(tibber_home.info['viewer']
@@ -94,6 +95,7 @@ class TibberSensor(Entity):
             return state is not None
 
         if _find_current_price():
+            self._is_available = True
             return
 
         _LOGGER.debug("No cached data found, so asking for new data")
@@ -105,7 +107,12 @@ class TibberSensor(Entity):
             data['meteringPointData']['gridCompany']
         self._device_state_attributes['estimated_annual_consumption'] =\
             data['meteringPointData']['estimatedAnnualConsumption']
-        _find_current_price()
+        self._is_available = _find_current_price()
+
+    @property
+    def available(self):
+        """Return True if entity is available."""
+        return self._is_available
 
     @property
     def device_state_attributes(self):
