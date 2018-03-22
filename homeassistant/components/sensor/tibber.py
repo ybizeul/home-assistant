@@ -99,8 +99,13 @@ class TibberSensor(Entity):
             return
 
         _LOGGER.debug("No cached data found, so asking for new data")
-        await self._tibber_home.update_info()
-        await self._tibber_home.update_price_info()
+        try
+            await self._tibber_home.update_info()
+            await self._tibber_home.update_price_info()
+        except (asyncio.TimeoutError, aiohttp.ClientError):
+            self._is_available = False
+            return
+
         data = self._tibber_home.info['viewer']['home']
         self._device_state_attributes['app_nickname'] = data['appNickname']
         self._device_state_attributes['grid_company'] =\
