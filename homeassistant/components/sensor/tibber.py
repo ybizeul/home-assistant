@@ -88,7 +88,7 @@ class TibberSensor(Entity):
             return
 
         _LOGGER.debug("No cached data found, so asking for new data")
-        try
+        try:
             await self._tibber_home.update_info()
             await self._tibber_home.update_price_info()
         except (asyncio.TimeoutError, aiohttp.ClientError):
