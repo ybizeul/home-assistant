@@ -96,7 +96,7 @@ class TibberSensor(Entity):
             self._device_state_attributes['min_price'] = min_price
             return state is not None and len(self._price_total) > 12
 
-        def _fetch_new_data()
+        def _fetch_new_data():
             _LOGGER.debug("No cached data found, so asking for new data")
             try:
                 await self._tibber_home.update_info()
