@@ -61,7 +61,6 @@ class TibberSensor(Entity):
         self._state = None
         self._is_available = False
         self._device_state_attributes = {}
-        self._price_total = {}
         self._unit_of_measurement = self._tibber_home.price_unit
         self._name = 'Electricity price {}'.format(tibber_home.info['viewer']
                                                    ['home']['appNickname'])
@@ -70,70 +69,55 @@ class TibberSensor(Entity):
         """Get the latest data and updates the states."""
         now = dt_util.utcnow()
         if self._tibber_home.current_price_total and self._last_updated and \
-           self._last_updated.hour == now.hour:
+           dt_util.as_utc(dt_util.parse_datetime(self._last_updated)).hour\
+           == now.hour:
             return
 
-        async def _find_current_price():
-            if len(self._price_total) < 12:
-                await _fetch_new_data()
+        def _find_current_price():
             state = None
             max_price = None
             min_price = None
-            for key, price_total in self._price_total.copy().items():
+            for key, price_total in self._tibber_home.price_total.items():
                 price_time = dt_util.as_utc(dt_util.parse_datetime(key))
                 price_total = round(price_total, 3)
                 time_diff = (now - price_time).total_seconds()/60
                 if time_diff >= 0 and time_diff < 60:
                     state = price_total
-                    self._last_updated = price_time
+                    self._last_updated = key
                 if now.date() == price_time.date():
                     if max_price is None or price_total > max_price:
                         max_price = price_total
                     if min_price is None or price_total < min_price:
                         min_price = price_total
-                if time_diff < 0:
-                    del self._price_total[key]
-            self._state = state
-            self._device_state_attributes['max_price'] = max_price
-            self._device_state_attributes['min_price'] = min_price
+                self._state = state
+                self._device_state_attributes['max_price'] = max_price
+                self._device_state_attributes['min_price'] = min_price
             return state is not None
 
-        async def _fetch_new_data():
-            try:
-                await self._tibber_home.update_info()
-                await self._tibber_home.update_price_info()
-            except (asyncio.TimeoutError, aiohttp.ClientError):
-                return False
-            self._price_total = self._tibber_home.price_total.copy()
-            data = self._tibber_home.info['viewer']['home']
-            self._device_state_attributes['app_nickname'] = data['appNickname']
-            self._device_state_attributes['grid_company'] =\
-                data['meteringPointData']['gridCompany']
-            self._device_state_attributes['estimated_annual_consumption'] =\
-                data['meteringPointData']['estimatedAnnualConsumption']
-            return True
-
-        if await _find_current_price():
+        if _find_current_price():
             self._is_available = True
             return
 
         _LOGGER.debug("No cached data found, so asking for new data")
-
-        if not await _fetch_new_data():
-            self._is_available = False
-            return
-
-        self._is_available = await _find_current_price()
-
-    @property
-    def available(self):
-        """Return True if entity is available."""
-        return self._is_available
+        await self._tibber_home.update_info()
+        await self._tibber_home.update_price_info()
+        data = self._tibber_home.info['viewer']['home']
+        self._device_state_attributes['app_nickname'] = data['appNickname']
+        self._device_state_attributes['grid_company'] =\
+            data['meteringPointData']['gridCompany']
+        self._device_state_attributes['estimated_annual_consumption'] =\
+            data['meteringPointData']['estimatedAnnualConsumption']
+        self._is_available = _find_current_price()
 
     @property
     def device_state_attributes(self):
         """Return the state attributes."""
         return self._device_state_attributes
+
+    @property
+    def available(self):
+        """Return True if entity is available."""
+        return self._is_available
 
     @property
     def name(self):
