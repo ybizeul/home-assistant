@@ -58,7 +58,7 @@ class TibberSensor(Entity):
         """Initialize the sensor."""
         self._tibber_home = tibber_home
         self._last_updated = None
-        self._last_fetch_data = None
+        self._newest_data = None
         self._state = None
         self._is_available = False
         self._device_state_attributes = {}
@@ -70,7 +70,7 @@ class TibberSensor(Entity):
         """Get the latest data and updates the states."""
         now = dt_util.utcnow()
         if self._tibber_home.current_price_total and self._last_updated and \
-           self._last_updated.hour == now.hour:
+           self._last_updated.hour == now.hour and self._newest_data:
             return
 
         async def _fetch_data():
@@ -95,6 +95,8 @@ class TibberSensor(Entity):
                 price_time = dt_util.as_utc(dt_util.parse_datetime(key))
                 price_total = round(price_total, 3)
                 time_diff = (now - price_time).total_seconds()/60
+                if not self._newest_data or price_time > self._newest_data:
+                    self._newest_data = price_time
                 if time_diff >= 0 and time_diff < 60:
                     state = price_total
                     self._last_updated = price_time
@@ -108,7 +110,7 @@ class TibberSensor(Entity):
                 self._device_state_attributes['min_price'] = min_price
             return state is not None
 
-        if not self._last_fetch_data or ((self._last_updated - now).total_seconds()/3600 > 12 and now.hour > 12):
+        if not self._newest_data or ((self._newest_data - now).total_seconds()/3600 > 12 and now.hour > 12):
             _LOGGER.error("Asking for new data.")
             await _fetch_data()
 
