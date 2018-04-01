@@ -58,6 +58,7 @@ class TibberSensor(Entity):
         """Initialize the sensor."""
         self._tibber_home = tibber_home
         self._last_updated = None
+        self._last_fetch_data = None
         self._state = None
         self._is_available = False
         self._device_state_attributes = {}
@@ -69,9 +70,22 @@ class TibberSensor(Entity):
         """Get the latest data and updates the states."""
         now = dt_util.utcnow()
         if self._tibber_home.current_price_total and self._last_updated and \
-           dt_util.as_utc(dt_util.parse_datetime(self._last_updated)).hour\
-           == now.hour:
+           self._last_updated.hour == now.hour:
             return
+
+        async def _fetch_data():
+            try:
+                await self._tibber_home.update_info()
+                await  self._tibber_home.update_price_info()
+            except (asyncio.TimeoutError, aiohttp.ClientError):
+                return
+            data = self._tibber_home.info['viewer']['home']
+            self._device_state_attributes['app_nickname'] = data['appNickname']
+            self._device_state_attributes['grid_company'] = \
+                data['meteringPointData']['gridCompany']
+            self._device_state_attributes['estimated_annual_consumption'] = \
+                data['meteringPointData']['estimatedAnnualConsumption']
+            self._last_fetch_data = now
 
         def _find_current_price():
             state = None
@@ -83,7 +97,7 @@ class TibberSensor(Entity):
                 time_diff = (now - price_time).total_seconds()/60
                 if time_diff >= 0 and time_diff < 60:
                     state = price_total
-                    self._last_updated = key
+                    self._last_updated = price_time
                 if now.date() == price_time.date():
                     if max_price is None or price_total > max_price:
                         max_price = price_total
@@ -94,19 +108,10 @@ class TibberSensor(Entity):
                 self._device_state_attributes['min_price'] = min_price
             return state is not None
 
-        if _find_current_price():
-            self._is_available = True
-            return
+        if not self._last_fetch_data or ((self._last_updated - now).total_seconds()/3600 > 12 and now.hour > 12):
+            _LOGGER.error("Asking for new data.")
+            await _fetch_data()
 
-        _LOGGER.debug("No cached data found, so asking for new data")
-        await self._tibber_home.update_info()
-        await self._tibber_home.update_price_info()
-        data = self._tibber_home.info['viewer']['home']
-        self._device_state_attributes['app_nickname'] = data['appNickname']
-        self._device_state_attributes['grid_company'] =\
-            data['meteringPointData']['gridCompany']
-        self._device_state_attributes['estimated_annual_consumption'] =\
-            data['meteringPointData']['estimatedAnnualConsumption']
         self._is_available = _find_current_price()
 
     @property
