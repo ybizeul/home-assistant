@@ -109,7 +109,7 @@ class TibberSensor(Entity):
                 self._device_state_attributes['min_price'] = min_price
             return state is not None
 
-        timed_diff = (self._newest_data - now).total_seconds()/3600
+        time_diff = (self._newest_data - now).total_seconds()/3600
         if not self._newest_data or (time_diff < 12
                                      and now.hour > 12):
             _LOGGER.error("Asking for new data.")
