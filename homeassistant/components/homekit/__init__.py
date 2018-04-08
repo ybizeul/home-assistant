@@ -11,8 +11,9 @@ import voluptuous as vol
 from homeassistant.components.climate import (
     SUPPORT_TARGET_TEMPERATURE_HIGH, SUPPORT_TARGET_TEMPERATURE_LOW)
 from homeassistant.components.cover import SUPPORT_SET_POSITION
+from homeassistant.components.cover import SUPPORT_OPEN
 from homeassistant.const import (
-    ATTR_CODE, ATTR_SUPPORTED_FEATURES, ATTR_UNIT_OF_MEASUREMENT,
+    ATTR_CODE, ATTR_SUPPORTED_FEATURES,ATTR_DEVICE_CLASS, ATTR_UNIT_OF_MEASUREMENT,
     CONF_PORT, TEMP_CELSIUS, TEMP_FAHRENHEIT,
     EVENT_HOMEASSISTANT_START, EVENT_HOMEASSISTANT_STOP)
 import homeassistant.helpers.config_validation as cv
@@ -94,13 +95,22 @@ def get_accessory(hass, state, aid, config):
 
     elif state.domain == 'cover':
         # Only add covers that support set_cover_position
-        features = state.attributes.get(ATTR_SUPPORTED_FEATURES, 0)
-        if features & SUPPORT_SET_POSITION:
+
+        # Garage doors are a different HomeKit category
+        features = state.attributes.get(ATTR_SUPPORTED_FEATURES, 0)        
+        isGarageDoor =  state.attributes.get(ATTR_DEVICE_CLASS) == 'garage'
+
+        if isGarageDoor:
+            _LOGGER.debug('Add "%s" as "%s"',
+                          state.entity_id, 'GarageDoorOpener')
+            return TYPES['GarageDoorOpener'](hass, state.entity_id, state.name,
+                                           aid=aid)
+        elif features & SUPPORT_SET_POSITION:
             _LOGGER.debug('Add "%s" as "%s"',
                           state.entity_id, 'WindowCovering')
             return TYPES['WindowCovering'](hass, state.entity_id, state.name,
                                            aid=aid)
-
+        
     elif state.domain == 'alarm_control_panel':
         _LOGGER.debug('Add "%s" as "%s"', state.entity_id, 'SecuritySystem')
         return TYPES['SecuritySystem'](hass, state.entity_id, state.name,
