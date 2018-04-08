@@ -120,6 +120,8 @@ class CommandCover(CoverDevice):
 
         None is unknown, 0 is closed, 100 is fully open.
         """
+        if self._state is None and self._command_state is not None:
+            return 0
         return self._state
 
     def _query_state(self):

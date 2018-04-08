@@ -30,6 +30,7 @@ CATEGORY_SENSOR = 'SENSOR'
 CATEGORY_SWITCH = 'SWITCH'
 CATEGORY_THERMOSTAT = 'THERMOSTAT'
 CATEGORY_WINDOW_COVERING = 'WINDOW_COVERING'
+CATEGORY_GARAGE_DOOR_OPENER = 'GARAGE_DOOR_OPENER'
 
 
 # #### Services ####
@@ -51,6 +52,7 @@ SERV_SWITCH = 'Switch'
 SERV_TEMPERATURE_SENSOR = 'TemperatureSensor'
 SERV_THERMOSTAT = 'Thermostat'
 SERV_WINDOW_COVERING = 'WindowCovering'
+SERV_GARAGE_DOOR_OPENER = 'GarageDoorOpener'
 
 
 # #### Characteristics ####
@@ -78,6 +80,9 @@ CHAR_NAME = 'Name'
 CHAR_OCCUPANCY_DETECTED = 'OccupancyDetected'
 CHAR_ON = 'On'  # boolean
 CHAR_POSITION_STATE = 'PositionState'
+CHAR_CURRENT_DOOR_STATE = "CurrentDoorState"
+CHAR_TARGET_DOOR_STATE = "TargetDoorState"
+CHAR_OBSTRUCTION_DETECTED = "ObstructionDetected"
 CHAR_SATURATION = 'Saturation'  # percent
 CHAR_SERIAL_NUMBER = 'SerialNumber'
 CHAR_SMOKE_DETECTED = 'SmokeDetected'

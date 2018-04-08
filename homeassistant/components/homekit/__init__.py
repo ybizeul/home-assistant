@@ -9,8 +9,13 @@ from zlib import adler32
 import voluptuous as vol
 
 from homeassistant.components.cover import SUPPORT_SET_POSITION
+from homeassistant.components.cover import SUPPORT_OPEN
 from homeassistant.const import (
+<<<<<<< HEAD
     ATTR_SUPPORTED_FEATURES, ATTR_UNIT_OF_MEASUREMENT,
+=======
+    ATTR_CODE, ATTR_SUPPORTED_FEATURES,ATTR_DEVICE_CLASS, ATTR_UNIT_OF_MEASUREMENT,
+>>>>>>> Add support for Garage door cover.
     CONF_PORT, TEMP_CELSIUS, TEMP_FAHRENHEIT,
     EVENT_HOMEASSISTANT_START, EVENT_HOMEASSISTANT_STOP)
 import homeassistant.helpers.config_validation as cv
@@ -90,14 +95,20 @@ def get_accessory(hass, state, aid, config):
         a_type = 'Thermostat'
 
     elif state.domain == 'cover':
-        # Only add covers that support set_cover_position
+        # Only add covers that support set_cover_position or garage doors
+
         features = state.attributes.get(ATTR_SUPPORTED_FEATURES, 0)
-        if features & SUPPORT_SET_POSITION:
+        isGarageDoor =  state.attributes.get(ATTR_DEVICE_CLASS) == 'garage'
+
+        if isGarageDoor:
+            a_type = 'GarageDoorOpener'
+
+        elif features & SUPPORT_SET_POSITION:
             a_type = 'WindowCovering'
 
     elif state.domain == 'light':
         a_type = 'Light'
-
+    
     elif state.domain == 'lock':
         a_type = 'Lock'
 
