@@ -9,7 +9,6 @@ from zlib import adler32
 import voluptuous as vol
 
 from homeassistant.components.cover import SUPPORT_SET_POSITION
-from homeassistant.components.cover import SUPPORT_OPEN
 from homeassistant.const import (
 <<<<<<< HEAD
     ATTR_SUPPORTED_FEATURES, ATTR_UNIT_OF_MEASUREMENT,
