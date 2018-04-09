@@ -124,6 +124,7 @@ class GarageDoorOpener(HomeAccessory):
                     self.current_state = GARAGE_DOOR_OPENER_CLOSED
                 else:
                     self.char_target_position.set_value(GARAGE_DOOR_OPENER_OPEN)
+                    self.char_current_position.set_value(GARAGE_DOOR_OPENER_OPENING)
                     self.current_state = GARAGE_DOOR_OPENER_OPEN
 
 
@@ -140,9 +141,7 @@ class GarageDoorOpener(HomeAccessory):
 
         if new_state is None:
             return
-        
-        _LOGGER.debug('%s: New state %s', self.entity_id, str(new_state))
-
+    
         old_position = None
         
         if old_state:

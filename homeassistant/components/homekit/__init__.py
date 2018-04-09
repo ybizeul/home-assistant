@@ -11,7 +11,6 @@ import voluptuous as vol
 from homeassistant.components.climate import (
     SUPPORT_TARGET_TEMPERATURE_HIGH, SUPPORT_TARGET_TEMPERATURE_LOW)
 from homeassistant.components.cover import SUPPORT_SET_POSITION
-from homeassistant.components.cover import SUPPORT_OPEN
 from homeassistant.const import (
     ATTR_CODE, ATTR_SUPPORTED_FEATURES,ATTR_DEVICE_CLASS, ATTR_UNIT_OF_MEASUREMENT,
     CONF_PORT, TEMP_CELSIUS, TEMP_FAHRENHEIT,
