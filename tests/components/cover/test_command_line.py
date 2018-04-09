@@ -66,7 +66,7 @@ class TestCommandCover(unittest.TestCase):
             }))
 
             state = self.hass.states.get('cover.test')
-            self.assertEqual('unknown', state.state)
+            self.assertEqual('closed', state.state)
 
             cover.open_cover(self.hass, 'cover.test')
             self.hass.block_till_done()
