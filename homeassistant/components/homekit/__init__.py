@@ -93,23 +93,24 @@ def get_accessory(hass, state, aid, config):
                                            aid=aid)
 
     elif state.domain == 'cover':
-        # Only add covers that support set_cover_position
+        features = state.attributes.get(ATTR_SUPPORTED_FEATURES, 0)
 
-        # Garage doors are a different HomeKit category
-        features = state.attributes.get(ATTR_SUPPORTED_FEATURES, 0)        
-        isGarageDoor =  state.attributes.get(ATTR_DEVICE_CLASS) == 'garage'
+        # Garage door is a special HomeKit category
+        isGarageDoor = state.attributes.get(ATTR_DEVICE_CLASS) == 'garage'
 
         if isGarageDoor:
             _LOGGER.debug('Add "%s" as "%s"',
                           state.entity_id, 'GarageDoorOpener')
             return TYPES['GarageDoorOpener'](hass, state.entity_id, state.name,
-                                           aid=aid)
+                                             aid=aid)
+
+        # Only add covers that support set_cover_position
         elif features & SUPPORT_SET_POSITION:
             _LOGGER.debug('Add "%s" as "%s"',
                           state.entity_id, 'WindowCovering')
             return TYPES['WindowCovering'](hass, state.entity_id, state.name,
                                            aid=aid)
-        
+
     elif state.domain == 'alarm_control_panel':
         _LOGGER.debug('Add "%s" as "%s"', state.entity_id, 'SecuritySystem')
         return TYPES['SecuritySystem'](hass, state.entity_id, state.name,
