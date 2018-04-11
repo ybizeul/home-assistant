@@ -79,12 +79,10 @@ class GarageDoorOpener(HomeAccessory):
     'Closing' status to HomeKit.
     """
 
-    def __init__(self, hass, entity_id, display_name, **kwargs):
+    def __init__(self, *args, config):
         """Initialize a GarageDoorOpener accessory object."""
         super().__init__(*args, category=CATEGORY_GARAGE_DOOR_OPENER)
 
-        self.hass = hass
-        self.entity_id = entity_id
         self.current_state = GARAGE_DOOR_OPENER_CLOSED
 
         serv_cover = add_preload_service(self, SERV_GARAGE_DOOR_OPENER)

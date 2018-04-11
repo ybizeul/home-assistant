@@ -93,7 +93,7 @@ def get_accessory(hass, state, aid, config):
         # Only add covers that support set_cover_position or garage doors
 
         features = state.attributes.get(ATTR_SUPPORTED_FEATURES, 0)
-        isGarageDoor =  state.attributes.get(ATTR_DEVICE_CLASS) == 'garage'
+        isGarageDoor = state.attributes.get(ATTR_DEVICE_CLASS) == 'garage'
 
         if isGarageDoor:
             a_type = 'GarageDoorOpener'
@@ -122,6 +122,7 @@ def get_accessory(hass, state, aid, config):
         return None
 
     _LOGGER.debug('Add "%s" as "%s"', state.entity_id, a_type)
+
     return TYPES[a_type](hass, state.name, state.entity_id, aid, config=config)
 
 

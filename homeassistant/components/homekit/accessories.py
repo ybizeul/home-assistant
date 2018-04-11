@@ -157,7 +157,7 @@ class HomeBridge(Bridge):
         super().remove_paired_client(client_uuid)
         show_setup_message(self.hass, self)
 
-
+        
 class HomeDriver(AccessoryDriver):
     """Adapter class for AccessoryDriver."""
 
