@@ -10,11 +10,7 @@ import voluptuous as vol
 
 from homeassistant.components.cover import SUPPORT_SET_POSITION
 from homeassistant.const import (
-<<<<<<< HEAD
-    ATTR_SUPPORTED_FEATURES, ATTR_UNIT_OF_MEASUREMENT,
-=======
-    ATTR_CODE, ATTR_SUPPORTED_FEATURES,ATTR_DEVICE_CLASS, ATTR_UNIT_OF_MEASUREMENT,
->>>>>>> Add support for Garage door cover.
+    ATTR_SUPPORTED_FEATURES,ATTR_DEVICE_CLASS, ATTR_UNIT_OF_MEASUREMENT,
     CONF_PORT, TEMP_CELSIUS, TEMP_FAHRENHEIT,
     EVENT_HOMEASSISTANT_START, EVENT_HOMEASSISTANT_STOP)
 import homeassistant.helpers.config_validation as cv
