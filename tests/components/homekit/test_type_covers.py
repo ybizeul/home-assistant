@@ -115,11 +115,20 @@ class TestHomekitSensors(unittest.TestCase):
         self.assertEqual(acc.char_current_position.value, GARAGE_DOOR_OPENER_OPENING)
         self.assertEqual(acc.char_target_position.value, GARAGE_DOOR_OPENER_OPEN)
 
-        # Set from HomeKit
-        self.hass.states.set(garage_cover,{ATTR_ASSUMED_STATE: True})
+        # Set from HomeKit (Assumed State is True)
+        self.hass.states.set(garage_cover, STATE_UNKNOWN, {ATTR_ASSUMED_STATE: True})
 
         acc.char_target_position.client_update_value(GARAGE_DOOR_OPENER_OPEN)
         self.hass.block_till_done()
         self.assertEqual(
             self.events[0].data[ATTR_SERVICE], 'open_cover')
         self.assertEqual(acc.char_target_position.value, GARAGE_DOOR_OPENER_CLOSED)
+
+        # Set from HomeKit (Assumed State is False)
+        self.hass.states.set(garage_cover, STATE_UNKNOWN, {ATTR_ASSUMED_STATE: False})
+
+        acc.char_target_position.client_update_value(GARAGE_DOOR_OPENER_OPEN)
+        self.hass.block_till_done()
+        self.assertEqual(
+            self.events[0].data[ATTR_SERVICE], 'open_cover')
+        self.assertEqual(acc.char_target_position.value, GARAGE_DOOR_OPENER_OPEN)

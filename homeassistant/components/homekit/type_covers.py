@@ -119,7 +119,7 @@ class GarageDoorOpener(HomeAccessory):
 
             assumed_state = self.hass.states.get(self.entity_id).attributes.get(ATTR_ASSUMED_STATE)
 
-            if value is GARAGE_DOOR_OPENER_OPEN:
+            if value == GARAGE_DOOR_OPENER_OPEN:
                 self.hass.components.cover.open_cover(self.entity_id)
 
                 if assumed_state:
@@ -130,7 +130,7 @@ class GarageDoorOpener(HomeAccessory):
                     self.char_current_position.set_value(GARAGE_DOOR_OPENER_OPENING)
                     self.current_state = GARAGE_DOOR_OPENER_OPENING
 
-            elif value is GARAGE_DOOR_OPENER_CLOSED:
+            elif value == GARAGE_DOOR_OPENER_CLOSED:
                 self.hass.components.cover.close_cover(self.entity_id)
 
                 self.char_target_position.set_value(GARAGE_DOOR_OPENER_CLOSED)
