@@ -93,7 +93,7 @@ class TestHomekitSensors(unittest.TestCase):
         """Test if accessory and HA are updated accordingly."""
         garage_cover = 'cover.garage'
 
-        acc = GarageDoorOpener(self.hass, garage_cover, 'Cover', aid=2)
+        acc = GarageDoorOpener(self.hass, 'Cover', garage_cover, 2, config=None)
         acc.run()
 
         self.assertEqual(acc.aid, 2)
